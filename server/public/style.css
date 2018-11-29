@@ -1,0 +1,33 @@
+html, body {
+    margin: 0;
+    padding: 0;
+
+    font-family: 'Montserrat', sans-serif;
+}
+
+.main {
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.main div {
+    text-align: center;
+}
+
+a {
+    color: #FF0060;
+    text-decoration: none;
+}
+
+#discord {
+    font-size: 32px;
+}
+
+i {
+    color: black;
+}

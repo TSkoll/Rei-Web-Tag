@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rei Tags</title>
+
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+</head>
+<body>
+    <div id="app">
+        <b-navbar toggleable="md" variant="info" type="dark">
+            <b-navbar-brand href="#">Rei Tags</b-navbar-brand>
+
+            <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+
+            <b-collapse is-nav id="nav_collapse">
+                <b-navbar-nav>
+                    <b-nav-item href="#" @click="UploadBtnClick()">Upload</b-nav-item>
+                </b-navbar-nav>
+
+                <b-navbar-nav class="ml-auto">
+                    <b-nav-item href="/logout">Logout</b-nav-item>
+                </b-navbar-nav>
+            </b-collapse>
+        </b-navbar>
+
+        <div style="margin-top: 20px" class="container">
+            <h1>Your Current Tags</h1>
+
+            <p v-if="tagList.length == 0">
+                It looks like that your tags came up empty! You should look into creating some
+                <a href="/upload">here</a>!
+            </p>
+            <b-list-group v-else="tagList.length == 0">
+                <b-list-group-item href="#" v-for="item in tagList" @click="showModal(item)">
+                    {{ item }}
+                </b-list-group-item>
+            </b-list-group>
+        </div>
+
+        <b-modal size="lg" ref="editModal" title="Editing Tag"
+            ok-title="Save"
+            cancel-title="Close"
+            @shown="editModalShown()">
+
+            <b-alert v-if="currentWorkingTag.success.show" show variant="success">
+                {{ currentWorkingTag.success.message }}
+            </b-alert>
+
+            <b-alert v-if="currentWorkingTag.error.show" show variant="warning">
+                {{ currentWorkingTag.error.message }}
+            </b-alert>
+
+            <h3>{{ currentWorkingTag.name }}</h3>
+            <b-form-input v-model="currentWorkingTag.content"
+                type="text"
+                placeholder="Empty text content"></b-form-input>
+
+            <b-form-file ref="editModalFile" v-model="currentWorkingTag.filebytes"
+                :state="Boolean(currentWorkingTag.filebytes)"
+                placeholder="Choose a file" @change="editModalFileChange($event)"
+                style="margin-top: 3px"></b-form-file>
+
+            <b-img v-if="currentWorkingTag.isimage" 
+            v-bind:src="currentWorkingTag.imagedata"
+            style="margin-top: 3px" fluid></b-img>
+
+            <p v-if="!currentWorkingTag.isimage && currentWorkingTag.file && !currentWorkingTag.filebytes">
+                file: <a v-bind:href="'/file/get/' + currentWorkingTag.file">{{ currentWorkingTag.file }}</a>
+            </p>
+
+            <div slot="modal-footer" class="w-100">
+                <b-button size="sm" class="float-right" variant="primary" @click="editModalOK()">
+                    Save
+                </b-button>
+                <b-button style="margin-right: 2px" size="sm" class="float-right" @click="closeEditModal()">
+                    Close
+                </b-button>
+                <b-button size="sm" class="float-left" variant="danger" @click="editModalDelete()">
+                    Delete
+                </b-button>
+            </div>
+        </b-modal>
+
+        <b-modal size="lg" ref="uploadModal" title="Create Tag"
+            ok-title="Create"
+            cancel-title="Close"
+            @ok="uploadModalOK($event)"
+            @show="uploadModalShown()">
+
+            <b-alert v-if="uploadTag.success.show" show variant="success">
+                {{ uploadTag.success.message }}
+            </b-alert>
+
+            <b-alert v-if="uploadTag.error.show" show variant="warning">
+                {{ uploadTag.error.message }}
+            </b-alert>
+
+            <b-form-input v-model="uploadTag.name"
+                type="text"
+                placeholder="Enter tag name"></b-form-input>
+
+            <b-form-input v-model="uploadTag.content"
+                type="text"
+                placeholder="Enter tag text content"
+                style="margin-top: 3px"></b-form-input>
+            
+            <b-form-file ref="uploadModalFile" v-model="uploadTag.file"
+                :state="Boolean(uploadTag.file)"
+                placeholder="Choose a file" @change="uploadModalFileChange($event)"
+                style="margin-top: 3px"></b-form-file>
+
+            <b-img v-if="uploadTag.isimage" v-bind:src="uploadTag.imagedata"
+            style="margin-top: 3px" fluid />
+        </b-modal>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <script src="//unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="/public/index.js"></script>
+</body>
+</html>
