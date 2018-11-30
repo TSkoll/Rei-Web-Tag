@@ -12,12 +12,7 @@ const uploads = multer(multerConfig);
 const passport = require('passport');
 const DiscordStrategy = require('passport-discord').Strategy;
 
-/*
-
-TODO:
-    - File size check (client)
-    - Bot authentication path (allow api key in checkAuth)
-*/
+const mariadb = require('mariadb');
 
 passport.serializeUser((user, done) => {
     done(null, user);
@@ -121,6 +116,22 @@ app.listen(port, () => {
 function checkAuth(req, res, next) {
     if (req && req.isAuthenticated())
         return next();
-    else
-        res.send(401, 'Not logged in!');
+
+    // API Key must be specified either in POST body or in GET query parameter
+    const apiKey = (req.body && req.body.k) || (req.query && req.query.k) || null;
+    if (apiKey) {
+        mariadb.createConnection(config.database)
+        .then(conn => {
+            conn.query("SELECT TOP 1 key FROM apikey WHERE key=?",
+            [ apiKey ])
+            .then(rows => {
+                if (rows.length > 0) {
+                    req.apiKey = rows[0].key;
+                    return next();
+                }
+            })
+        });
+    }
+
+    res.send("Not authenticated!");
 }

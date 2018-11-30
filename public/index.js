@@ -103,6 +103,18 @@ const app = new Vue({
             this.currentWorkingTag.error.show = false;
         },
         editModalOK(event) {
+            if ((this.currentWorkingTag.content == null || this.currentWorkingTag.content == '') 
+                && (!this.currentWorkingTag.filebytes && !this.currentWorkingTag.file)) {
+
+                this.showEditModalError("A tag must contain text or an image!")
+                return;
+            }
+
+            if (this.currentWorkingTag.filebytes && this.currentWorkingTag.filebytes.size > 8388608) {
+                this.showEditModalError("File must be less than 8 megabytes in size!")
+                return;
+            }
+
             let form = new FormData();
             form.append('name', this.currentWorkingTag.name);
             form.append('content', this.currentWorkingTag.content);
@@ -117,19 +129,13 @@ const app = new Vue({
 
             this.$http.post('/tag/update', form)
             .then(resp => {
-                console.log("tag update success!")
-
-                this.currentWorkingTag.success.show = true;
-                this.currentWorkingTag.success.message = "Tag updated!"
-
-                this.currentWorkingTag.error.show = false;
+                if (resp.body == "OK") {
+                    this.showEditModalSuccess("Tag updated!");
+                } else {
+                    this.showEditModalError(resp.body);
+                }
             }, resp => {
-                console.log("tag update error!")
-
-                this.currentWorkingTag.error.show = true;
-                this.currentWorkingTag.error.message = resp.body;
-
-                this.currentWorkingTag.success.show = false;
+                this.showEditModalError(resp.body)
             });
         },
         uploadModalFileChange(event) {
@@ -158,6 +164,12 @@ const app = new Vue({
 
             if (this.uploadTag.name && (this.uploadTag.file || 
                     (this.uploadTag.content && this.uploadTag.content != ''))) {
+
+                if (this.uploadTag.file && this.uploadTag.file.size > 8388608) {
+                    this.showEditModalError("File must be less than 8 megabytes in size!")
+                    return;
+                }
+
                 let form = new FormData();
                 form.append('tagName', this.uploadTag.name);
                 form.append('tagContent', this.uploadTag.content);
@@ -165,27 +177,18 @@ const app = new Vue({
 
                 this.$http.post('/tag/upload', form)
                 .then(resp => {
-                    console.log("tag create success!")
-
-                    this.uploadTag.error.show = false;
-
-                    this.uploadTag.success.show = true;
-                    this.uploadTag.success.message = "Tag uploaded!";
-
-                    this.tagList.push(this.uploadTag.name);
+                    if (resp.body == "OK") {
+                        this.showUploadModalSuccess("Tag created!");
+    
+                        this.tagList.push(this.uploadTag.name);
+                    } else {
+                        this.showUploadModalError(resp.body);
+                    }
                 }, resp => {
-                    console.log("tag create success!")
-
-                    this.uploadTag.success.show = false;
-
-                    this.uploadTag.error.show = true;
-                    this.uploadTag.error.message = "Something went wrong while uploading a tag!";
+                    this.showUploadModalError(resp.body);
                 });
             } else {
-                this.uploadTag.success.show = false;
-
-                this.uploadTag.error.show = true;
-                this.uploadTag.error.message = "A tag has to contain a name and a file or text content!";
+                this.showUploadModalError("A tag has to contain a name and a file or text content!")
             }
         },
         UploadBtnClick() {
@@ -203,11 +206,32 @@ const app = new Vue({
 
                 this.$refs.editModal.hide();
             }, resp => {
-                this.uploadTag.success.show = false;
-
-                this.uploadTag.error.show = true;
-                this.uploadTag.error.message = "An error occured while trying to delete the tag!";
+                this.showEditModalError(resp.body);
             });
+        },
+        showEditModalError(message) {
+            this.uploadTag.success.show = false;
+
+            this.uploadTag.error.show = true;
+            this.uploadTag.error.message = message;
+        },
+        showEditModalSuccess(message) {
+            this.currentWorkingTag.success.show = true;
+            this.currentWorkingTag.success.message = message;
+    
+            this.currentWorkingTag.error.show = false;
+        },
+        showUploadModalError(message) {
+            this.uploadTag.success.show = false;
+
+            this.uploadTag.error.show = true;
+            this.uploadTag.error.message = message;
+        },
+        showUploadModalSuccess(message) {
+            this.uploadTag.error.show = false;
+
+            this.uploadTag.success.show = true;
+            this.uploadTag.success.message = message;
         }
     },
     beforeMount() {

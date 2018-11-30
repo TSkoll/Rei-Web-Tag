@@ -32,7 +32,7 @@
 
             <p v-if="tagList.length == 0">
                 It looks like that your tags came up empty! You should look into creating some
-                <a href="/upload">here</a>!
+                <a href="#" @click="UploadBtnClick()">here</a>!
             </p>
             <b-list-group v-else="tagList.length == 0">
                 <b-list-group-item href="#" v-for="item in tagList" @click="showModal(item)">

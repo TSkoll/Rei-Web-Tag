@@ -14,8 +14,10 @@ const config = require('../../config.json');
 module.exports = function(req, res) {
     mariadb.createConnection(config.database)
     .then(conn => {
+        const userid = (req.apiKey) ? req.body.u : req.user.id;
+
         conn.query("SELECT name FROM tag WHERE userid=? AND name=?",
-        [ req.user.id, req.body.tagName ])
+        [ userid, req.body.tagName ])
         .then(rows => {
             if (rows.length > 0) {
                 conn.destroy();
@@ -31,9 +33,10 @@ module.exports = function(req, res) {
 
                     res.send(200);
                 }).catch(err => {
-                    conn.destroy();
+                    if (conn)
+                        conn.destroy();
 
-                    res.send(err);
+                    res.send(err.code);
                 });
             }
         })
