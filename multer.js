@@ -1,5 +1,6 @@
 const multer = require('multer');
 const mime = require('mime-types');
+const path = require('path');
 
 /*
         DISK STORAGE
@@ -9,7 +10,7 @@ function diskStorageDestinationHandler(req, file, cb) {
 }
 
 function diskStorageFilenameHandler(req, file, cb) {
-    cb(null, Date.now() + '.' + mime.extension(file.mimetype));
+    cb(null, Date.now() + path.extname(file.originalname));
 }
 
 const storage = multer.diskStorage({
