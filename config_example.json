@@ -1,0 +1,23 @@
+{
+    "discordAuth": {
+        "clientID": "",
+        "clientSecret": "",
+        "callbackURL": "",
+        "scope": [
+            "identify"
+        ]
+    },
+
+    "sessionAuth": {
+        "secret": "",
+        "resave": false,
+        "saveUnitiliazed": false
+    },
+
+    "database": {
+        "host": "",
+        "user": "",
+        "password": "",
+        "database": ""
+    }
+}
