@@ -10,7 +10,7 @@ const config = require('../../config.json');
 module.exports = function(req, res) {
     mariadb.createConnection(config.database)
     .then(conn => {
-        const userid = (req.apiKey) ? req.query.u : req.user.id;
+        const userid = (req.apiKey) ? req.query.u || req.body.u : req.user.id;
 
         conn.query("SELECT name FROM tag WHERE userid=?",
         [ userid ])

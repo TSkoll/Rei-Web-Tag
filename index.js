@@ -118,11 +118,11 @@ function checkAuth(req, res, next) {
         return next();
 
     // API Key must be specified either in POST body or in GET query parameter
-    const apiKey = (req.body && req.body.k) || (req.query && req.query.k) || null;
+    const apiKey = (req.query && req.query.k) || null;
     if (apiKey) {
         mariadb.createConnection(config.database)
         .then(conn => {
-            conn.query("SELECT TOP 1 key FROM apikey WHERE key=?",
+            conn.query("SELECT * FROM apikey WHERE apikey.key=?",
             [ apiKey ])
             .then(rows => {
                 if (rows.length > 0) {
@@ -131,7 +131,7 @@ function checkAuth(req, res, next) {
                 }
             })
         });
+    } else {
+        res.send("Not authenticated!");
     }
-
-    res.send("Not authenticated!");
 }

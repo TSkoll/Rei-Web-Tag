@@ -14,7 +14,7 @@ const config = require('../../config.json');
 module.exports = function(req, res) {
     mariadb.createConnection(config.database)
     .then(conn => {
-        const userid = (req.apiKey) ? req.body.u : req.user.id;
+        const userid = (req.apiKey) ? req.query.u || req.body.u : req.user.id;
 
         conn.query("SELECT name FROM tag WHERE userid=? AND name=?",
         [ userid, req.body.tagName ])
@@ -25,8 +25,8 @@ module.exports = function(req, res) {
             } else {
                 conn.query("INSERT INTO tag VALUES (null, ?, ?, ?, ?)",
                 [   req.body.tagName, 
-                    req.user.id, 
-                    (req.body.tagContent == '') ? null : req.body.tagContent,
+                    userid, 
+                    (!req.body.tagContent || req.body.tagContent == '') ? null : req.body.tagContent,
                     (req.file) ? req.file.filename : null
                 ]).then(() => {
                     conn.destroy();
