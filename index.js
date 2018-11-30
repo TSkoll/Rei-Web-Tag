@@ -93,10 +93,14 @@ app.get('/file/get/:name', checkAuth , fileGet);
 */
 app.get('/', (req, res) => {
     if (req.user) 
-        res.sendFile(__dirname + '/html/index.html');
+        res.redirect('/app')
     else
         res.sendFile(__dirname + '/html/offlineindex.html');
 });
+
+app.get('/app', checkAuth, (req, res) => {
+    res.sendFile(__dirname + '/html/index.html');
+})
 
 app.get('/callback',
     passport.authenticate('discord', {failureRedirect: '/'}),
