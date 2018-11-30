@@ -6,8 +6,6 @@ Vue.http.interceptors.push((request, next) => {
 const app = new Vue({
     el: '#app',
     data: {
-        tagName: '',
-        tagContent: '',
         tagList: [],
         currentWorkingTag: {
              name: 'temp name',
@@ -42,13 +40,11 @@ const app = new Vue({
         }
     },
     methods: {
-        processFile(event) {
-            this.fileContent = event.target.files[0];
-        },
         getData() {
             this.$http.get('/tag/list/').then(resp => {
                 const content = resp.body;
                 if (content && content.length > 0) {
+                    // Treat possible null return correctly
                     this.tagList = (content) ? content : [];
                 }
                 else {
